@@ -1,0 +1,130 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <style>
+        /* style.css */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 125vh;
+            background-color: #f4f4f9;
+        }
+
+        .error-message {
+            background-color: rgba(255, 0, 0, 0.1); /* Soft red background */
+            color: #ff4d4d; /* Red text */
+            padding: 15px;
+            border: 1px solid #ff4d4d;
+            border-radius: 5px;
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 10px auto;
+            width: 50%;
+            transform: scale(0); /* Start small */
+            opacity: 0; /* Start invisible */
+            animation: grow 1s ease-in-out forwards; /* Trigger animation */
+        }
+
+        
+        /* Same animation reused */
+        @keyframes grow {
+            0% {
+                transform: scale(0);
+                opacity: 0;
+            }
+            50% {
+                transform: scale(1.2);
+                opacity: 0.8;
+            }
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        form {
+            background-color: #ffffff;
+            padding: 20px 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            width: 400px;
+        }
+
+        h1, h3 {
+            text-align: center;
+            color: #333333;
+        }
+
+        input[type="text"], input[type="number"], input[type="file"], input[type="submit"], input[type="reset"] {
+            display: block;
+            width: calc(100%);
+            margin: 10px auto;
+            padding: 10px;
+            border: 1px solid #cccccc;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+
+        input[type="submit"] {
+            background-color: #4caf50;
+            color: white;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        input[type="submit"]:hover {
+            background-color: #45a049;
+        }
+
+        input[type="reset"] {
+            background-color: #e74c3c;
+            color: white;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        input[type="reset"]:hover {
+            background-color: #c0392b;
+        }
+
+    </style>
+</head>
+<body>
+<form action="" method="post">
+    {% csrf_token %}
+    <h3>Register form</h3><br>
+
+    {% if messages %}
+        <div class="messages">
+            {% for message in messages %}
+                <div class="error-message">{{ message }}</div>
+            {% endfor %}
+        </div>
+        <!-- Include the audio file -->
+        <audio id="errorAudio" src="{% static 'voice_messages/successfully_registered.mp3' %}"></audio>
+    {% endif %}
+    {#    <input type="text" placeholder="Full name"><br>#}
+    {#    <input type="number" name="face_id" placeholder="Number"><br>#}
+    {#    <input type="text" name="email" id="" placeholder="Email"> <br>#}
+    {#    <input type="text" name="phone" placeholder="Phone"><br>#}
+    {#    <input type="text" name="job" id="" placeholder="Job"><br>#}
+    {#    <input type="text" name="address" placeholder="Address"><br>#}
+    {#    <input type="text" name="bio" placeholder="About"><br>#}
+    {#    <input type="file" name="dp" accept="image/*" id=""><br>#}
+    {#    <input type="submit" value="Register"><br>#}
+    {#    <input type="reset" value="Clear">#}
+    {{ form.as_p }}
+    <input type="submit" value="Register"><br>
+    <input type="reset" value="Clear">
+</form>
+</body>
+</html>
