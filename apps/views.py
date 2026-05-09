@@ -3,7 +3,7 @@ import time
 from django.contrib import messages
 from django.shortcuts import render, redirect
 
-from Face_Detection.detection import FaceRecognition
+from apps.detection import FaceRecognition
 from .forms import *
 
 faceRecognition = FaceRecognition()
@@ -17,10 +17,10 @@ def register(request):
     if request.method == "POST":
         form = ResgistrationForm(request.POST or None)
         if form.is_valid():
-            form.save()
+            user = form.save()
             print("IN HERE")
             messages.success(request, "SuccessFully registered!")
-            addFace(request.POST['face_id'])
+            addFace(user.face_id)
             time.sleep(2)
             return redirect('home')
         else:
@@ -40,23 +40,24 @@ def addFace(face_id):
 
 def login(request):
     face_id = faceRecognition.recognizeFace()
-    print(face_id)
-    user = UserProfile.objects.filter(face_id=face_id).exists()
-    if not user:
-        danger_message = 'Authentication failed!'
-        messages.add_message(request, level=20, message=danger_message)
+
+    if face_id is None:
+        messages.error(request, "Authentication failed!")
         return redirect('home')
-    messages.add_message(request, level=20, message='You are welcome')
-    return redirect('greeting', str(face_id))
+
+    user = UserProfile.objects.filter(face_id=face_id).first()
+
+    if not user:
+        messages.error(request, "Authentication failed!")
+        return redirect('home')
+
+    messages.success(request, "You are welcome")
+    return redirect('greeting', str(user.face_id))
 
 
 def greeting(request, face_id):
-    face_id = int(face_id)
     try:
-        face_id = UserProfile.objects.get(face_id=face_id).pk
-        context = {
-            'user': UserProfile.objects.get(face_id=face_id)
-        }
-        return render(request, 'faceDetection/greeting.html', context=context)
-    except:
-        return render(request, 'faceDetection/home.html')
+        user = UserProfile.objects.get(face_id=face_id)
+        return render(request, 'faceDetection/greeting.html', {'user': user})
+    except UserProfile.DoesNotExist:
+        return redirect('home')

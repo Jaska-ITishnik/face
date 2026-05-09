@@ -1,3 +1,4 @@
+{% load custom_tags %}
 {% load static %}
 <!DOCTYPE html>
 <html lang="en">
@@ -169,7 +170,7 @@
     <a href="{% url 'register' %}" class="btn register">Register</a>
     <a href="{% url 'login' %}" class="btn login">Login</a>
     <footer>
-        <p>&copy; 2024 TUIT. All Rights Reserved. <a href="#">Learn more</a></p>
+        <p>&copy; 2024 - {% curr_year %} TUIT. All Rights Reserved. <a href="#">Learn more</a></p>
     </footer>
 </div>
 </body>

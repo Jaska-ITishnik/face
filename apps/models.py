@@ -1,15 +1,16 @@
-from django.db import models
-from django.db.models.signals import post_save
+from django.db.models import Model, ImageField
+from django.db.models.fields import BigAutoField, CharField
 
-class UserProfile(models.Model):
-    face_id = models.IntegerField(primary_key=True)
-    name = models.CharField(max_length=50)
-    address = models.CharField(max_length = 100)
-    job = models.CharField(max_length = 15)
-    phone = models.CharField(max_length =  10)
-    email = models.CharField(max_length = 20)
-    bio = models.CharField(max_length = 200)
-    image = models.ImageField(upload_to='profile_image', blank=True)
+
+class UserProfile(Model):
+    face_id = BigAutoField(primary_key=True)
+    name = CharField(max_length=50)
+    address = CharField(max_length=100)
+    job = CharField(max_length=15)
+    phone = CharField(max_length=10)
+    email = CharField(max_length=20)
+    bio = CharField(max_length=200)
+    image = ImageField(upload_to='profile_image', blank=True)
 
     def __str__(self):
         return self.name

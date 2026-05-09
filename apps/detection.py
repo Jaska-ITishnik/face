@@ -6,13 +6,13 @@ from PIL import Image
 
 from root.settings import BASE_DIR
 
-detector = cv2.CascadeClassifier(BASE_DIR + '/Face_Detection/haarcascade_frontalface_default.xml')
+detector = cv2.CascadeClassifier(BASE_DIR + '/apps/haarcascade_frontalface_default.xml')
 recognizer = cv2.face.LBPHFaceRecognizer_create()
 
 
 class FaceRecognition:
 
-    def faceDetect(self, Entry1, ):
+    def faceDetect(self, Entry1):
         face_id = Entry1
         cam = cv2.VideoCapture(0)
 
@@ -29,7 +29,7 @@ class FaceRecognition:
                 cv2.rectangle(img, (x, y), (x + w, y + h), (255, 0, 0), 2)
                 count += 1
 
-                cv2.imwrite(BASE_DIR + '/Face_Detection/dataset/User.' + str(face_id) + '.' + str(count) + ".jpg",
+                cv2.imwrite(BASE_DIR + '/apps/dataset/User.' + str(face_id) + '.' + str(count) + ".jpg",
                             gray[y:y + h, x:x + w])
 
                 cv2.imshow('Register Face', img)
@@ -45,7 +45,7 @@ class FaceRecognition:
 
     def trainFace(self):
 
-        path = BASE_DIR + '/Face_Detection/dataset'
+        path = BASE_DIR + '/apps/dataset'
 
         def getImagesAndLabels(path):
 
@@ -73,26 +73,24 @@ class FaceRecognition:
         recognizer.train(faces, np.array(ids))
 
         recognizer.save(
-            BASE_DIR + '/Face_Detection/trainer/trainer.yml')
+            BASE_DIR + '/apps/trainer/trainer.yml')
 
         print("\n {0} faces trained. Exiting Program".format(len(np.unique(ids))))
 
     def recognizeFace(self):
-        recognizer.read(BASE_DIR + '/Face_Detection/trainer/trainer.yml')
-        cascadePath = BASE_DIR + '/Face_Detection/haarcascade_frontalface_default.xml'
-        faceCascade = cv2.CascadeClassifier(cascadePath)
+        recognizer.read(BASE_DIR + '/apps/trainer/trainer.yml')
 
-        font = cv2.FONT_HERSHEY_SIMPLEX
-
-        confidence = 0
+        faceCascade = cv2.CascadeClassifier(BASE_DIR + '/apps/haarcascade_frontalface_default.xml')
         cam = cv2.VideoCapture(0)
 
-        minW = 0.1 * cam.get(3)
-        minH = 0.1 * cam.get(4)
+        matched_face_id = None
+        best_confidence = 999
 
         while True:
-
             ret, img = cam.read()
+
+            if not ret:
+                break
 
             gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 
@@ -100,33 +98,32 @@ class FaceRecognition:
                 gray,
                 scaleFactor=1.2,
                 minNeighbors=5,
-                minSize=(int(minW), int(minH)),
+                minSize=(80, 80),
             )
 
             for (x, y, w, h) in faces:
+                face_roi = gray[y:y + h, x:x + w]
 
-                cv2.rectangle(img, (x, y), (x + w, y + h), (0, 255, 0), 2)
+                face_id, confidence = recognizer.predict(face_roi)
 
-                face_id, confidence = recognizer.predict(gray[y:y + h, x:x + w])
+                print("Predicted:", face_id, "Confidence:", confidence)
 
-                if (confidence < 100):
-                    name = 'Detected'
-                else:
-                    name = "Unknown"
+                if confidence < best_confidence:
+                    best_confidence = confidence
+                    matched_face_id = face_id
 
-                cv2.putText(img, str(name), (x + 5, y - 5), font, 1, (255, 255, 255), 2)
-                cv2.putText(img, str(confidence), (x + 5, y + h - 5), font, 1, (255, 255, 0), 1)
+                if confidence < 45:
+                    cam.release()
+                    cv2.destroyAllWindows()
+                    return face_id
 
             cv2.imshow('Detect Face', img)
 
             k = cv2.waitKey(10) & 0xff
             if k == 27:
                 break
-            if confidence > 50:
-                break
 
-        print("\n Exiting Program")
         cam.release()
         cv2.destroyAllWindows()
-        print(face_id)
-        return face_id
+
+        return None
