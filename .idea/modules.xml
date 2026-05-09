@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/Face-recognition-registration-and-login-system-OpenCv-Django.iml" filepath="$PROJECT_DIR$/.idea/Face-recognition-registration-and-login-system-OpenCv-Django.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/FaceRecognizer.iml" filepath="$PROJECT_DIR$/.idea/FaceRecognizer.iml" />
     </modules>
   </component>
 </project>
